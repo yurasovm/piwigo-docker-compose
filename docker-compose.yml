@@ -1,0 +1,39 @@
+version: "2.1"
+
+services:
+  db:
+    image: mysql
+    restart: always
+    networks:
+      - piwigo-net
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./piwigodb:/var/lib/mysql
+  piwigo:
+    image: ghcr.io/linuxserver/piwigo
+    container_name: piwigo
+    depends_on:
+      - db
+    networks:
+      - piwigo-net
+    environment:
+      - PUID=1026
+      - PGID=100
+      - TZ=${TIME_ZONE}
+    volumes:
+      - ./config:/config
+      - ./gallery:/gallery
+    ports:
+      - ${PORT}:80
+    restart: always
+
+networks:
+  piwigo-net:
+
+volumes:
+  config:
+  db:
